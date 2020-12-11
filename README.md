@@ -5,7 +5,7 @@ Compilar: `g++ code/invertir.cpp code/EasyBMP.cpp -o code/invertir`
 
 Ejecutar: `./invertir ruta_origen ruta_destino version tratamiento`
 
-Ejemplo: `code/cpp/invertir img/1000.bmp img/1000_inv.bmp 1 1`
+Ejemplo: `src/cpp/invertir img/1000.bmp img/1000_inv.bmp 1 1`
 
 
 
@@ -19,4 +19,4 @@ Compilar: `go build invertir.go`
 
 Ejecutar: `./invert pc versionAlgoritmo tratamiento versionImg`
 
-Ejemplo `code/go/invert 2 2 1 400`
+Ejemplo `src/go/invertir_go 2 2 1 400`
