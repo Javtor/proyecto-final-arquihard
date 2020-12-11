@@ -1,10 +1,12 @@
-#pragma GCC optimize("O2") 
+// #pragma GCC optimize("O2") 
 #include <iostream>
 #include <stdlib.h>
 #include "EasyBMP.h"
 #include <cstring>
 #include <chrono>
 #include <fstream>
+#include <vector>
+#include <numeric>
 
 using namespace std;
 
@@ -14,6 +16,8 @@ struct rgb
 };
 
 const int NUM_MUESTRAS = 100;
+const double confianza = 1.96; //95%
+const double error = 0.25;
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +36,9 @@ int main(int argc, char *argv[])
 
     fstream apilados;
     apilados.open("apilados.csv", fstream::app);
+
+    fstream metricas;
+    metricas.open("metricas.csv", fstream::app);
 
     if(!(apilados.good())){
         apilados << "PC;Tam (nxn);Algoritmo;Lenguaje;Repeticion;Tiempo (ns)";
@@ -66,7 +73,7 @@ int main(int argc, char *argv[])
     string pc(argpc);
     string archivoSalida = "data/pc" + pc + "-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
     freopen(archivoSalida.c_str(), "w", stdout);
-
+    vector<double> datos;
     int n = NUM_MUESTRAS;
     while (n--)
     {
@@ -169,8 +176,22 @@ int main(int argc, char *argv[])
         auto cnt = (double)duration.count();
         double normalized = cnt / (double)(width * height);
         std::cout << normalized << std::endl;
+        datos.push_back(normalized);
         apilados << pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento + ";" + to_string(normalized) << std::endl;
     }
+
+    double sum = accumulate(datos.begin(),datos.end(),0);
+    double media = sum/datos.size();
+    double varianza = 0;
+    for(double dato : datos){
+        varianza += (dato-media)*(dato-media);
+    }
+    varianza /= (datos.size()-1);
+    double desv = sqrt(varianza);
+    double tamMuestra = (confianza*desv/error)*(confianza*desv/error);
+
+
+     metricas<< pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento + ";" + to_string(media) +';'+to_string(varianza) +';'+to_string(desv) +';'+to_string(tamMuestra)<< std::endl;
 
     //Escribe la matriz de pixeles en el nuevo bmp
     for (int r = 0; r < height; r++)
