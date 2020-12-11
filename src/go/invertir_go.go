@@ -30,7 +30,7 @@ var (
 
 	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
 	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
-	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
+	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.csv"
 	csvFile        = "apilados.csv"
 )
 
