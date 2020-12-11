@@ -23,18 +23,17 @@ int main(int argc, char *argv[])
         getchar();
         return 0;
     }
-    auto arg1 = argv[1];
-    auto arg2 = argv[2];
-    auto arg3 = argv[3];
-    auto arg4 = argv[4];
 
-    // auto arg1 = "balloons.bmp";
-    // auto arg2 = "invertido.bmp";
-    // auto arg3 = "1";
+    auto argpc = argv[1];
+    auto argversion = argv[2];
+    auto argtratamiento = argv[3];
+    auto argorigen = argv[4];
 
     // Lee el bmp dentro de la matriz de pixeles
     BMP img;
-    img.ReadFromFile(arg1);
+    string srcPath = "img/"+string(argorigen)+".bmp";
+    string dstPath = "img/inverted_"+string(argorigen)+".bmp";
+    img.ReadFromFile(srcPath.c_str());
     const int width = img.TellWidth();
     const int height = img.TellHeight();
     rgb ImRGB0[height][width];
@@ -54,9 +53,10 @@ int main(int argc, char *argv[])
     memcpy(ImRGB, ImRGB0, height * width * sizeof(rgb));
 
     //Ejecuta el algoritmo
-    long version = strtol(arg3, NULL, 10);
-    string tratamiento(arg4);
-    string archivoSalida = "datos/pc1-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
+    long version = strtol(argversion, NULL, 10);
+    string tratamiento(argtratamiento);
+    string pc(argpc);
+    string archivoSalida = "datos/pc"+pc+"-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
     freopen(archivoSalida.c_str(), "w", stdout);
 
     int n = NUM_MUESTRAS;
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
             img.SetPixel(c, r, Temp);
         }
     }
-    img.WriteToFile(arg2);
+    img.WriteToFile(dstPath.c_str());
 
     return 0;
 }
