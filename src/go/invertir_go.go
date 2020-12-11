@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"image"
 	"image/color"
@@ -29,7 +30,8 @@ var (
 
 	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
 	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
-	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
+	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.csv"
+	csvFile        = "tratamientos.csv"
 )
 
 func invert(t int, in, out string) error {
@@ -82,8 +84,12 @@ func makeArray(height, width int, img image.Image) [][]rgb {
 }
 
 func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
-	fmt.Println(fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t))
-	f, err := os.Create(filepath.Join("./datos/", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)))
+	f, err := os.Create(filepath.Join("data", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)))
+	if err != nil {
+		return err
+	}
+
+	fCsv, err := os.OpenFile(csvFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
@@ -166,20 +172,42 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		stop := time.Now()
 		elapsed := stop.Sub(start).Nanoseconds()
 
-		normalized := elapsed / int64(width*height)
+		normalized := float64(elapsed) / float64(width*height)
 
-		_, err = f.WriteString(strconv.FormatInt(normalized, 10)+"\n")
+		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", strconv.FormatInt(int64(n+1), 10), strconv.FormatFloat(normalized, 'f', 3, 64)}
+		writer := csv.NewWriter(f)
+
+		err = writer.Write(row)
 		if err != nil {
 			return err
 		}
+
+		writer.Flush()
+
+		writerFullCSVFile := csv.NewWriter(fCsv)
+		err = writerFullCSVFile.Write(row)
+		if err != nil {
+			return err
+		}
+
+		writerFullCSVFile.Flush()
 	}
-	f.Close()
+	err = f.Close()
+	if err != nil {
+		return err
+	}
+	err = fCsv.Close()
+	if err != nil {
+		return err
+	}
 	//Write new img
 
 	fImg, err := os.Create(outputImgPath)
 	if err != nil {
 		return err
 	}
+
+	defer fImg.Close()
 
 	upLeft := image.Point{0, 0}
 	upRight := image.Point{width, height}
@@ -205,7 +233,6 @@ func main() {
 	inputImgPath = fmt.Sprintf(inputImgPath, imgVersion)
 	outputImgPath = fmt.Sprintf(outputImgPath, imgVersion)
 
-	fmt.Println(inputImgPath, outputImgPath)
 	version, err := strconv.Atoi(args[2])
 	if err != nil {
 		panic(err)
