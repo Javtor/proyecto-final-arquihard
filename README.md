@@ -13,6 +13,8 @@ Usando go en linux
 
 se le pasan argumentos ./invert pc versionAlgoritmo tratamiento versionImg
 
+Antes de : `go get "golang.org/x/image/bmp"`
+
 Compilar: `go build invertir.go`
 
 Ejecutar: `./invert pc versionAlgoritmo tratamiento versionImg`
