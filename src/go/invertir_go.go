@@ -30,8 +30,8 @@ var (
 
 	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
 	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
-	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.csv"
-	csvFile        = "tratamientos.csv"
+	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
+	csvFile        = "apilados.csv"
 )
 
 func invert(t int, in, out string) error {
@@ -174,7 +174,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 
 		normalized := float64(elapsed) / float64(width*height)
 
-		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", strconv.FormatInt(int64(n+1), 10), strconv.FormatFloat(normalized, 'f', 3, 64)}
+		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", t, strconv.FormatFloat(normalized, 'f', 3, 64)}
 
 		_, err = f.WriteString(strconv.FormatFloat(normalized, 'f', 3, 64) + "\n")
 		if err != nil {
@@ -182,6 +182,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		}
 
 		writerFullCSVFile := csv.NewWriter(fCsv)
+		writerFullCSVFile.Comma = ';'
 		err = writerFullCSVFile.Write(row)
 		if err != nil {
 			return err

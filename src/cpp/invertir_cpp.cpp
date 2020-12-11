@@ -1,3 +1,4 @@
+#pragma GCC optimize("O2") 
 #include <iostream>
 #include <stdlib.h>
 #include "EasyBMP.h"
@@ -14,13 +15,12 @@ struct rgb
 
 const int NUM_MUESTRAS = 100;
 
-// Uso: ./invertir ruta_origen ruta_destino version
 int main(int argc, char *argv[])
 {
 
     if (argc < 5)
     {
-        std::cout << "Uso: ./invertir ruta_origen ruta_destino version tratamiento\nPresiona ENTER para continuar...\n";
+        std::cout << "Verifica los argumentos de consola\nPresiona ENTER para continuar...\n";
         getchar();
         return 0;
     }
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     long version = strtol(argversion, NULL, 10);
     string tratamiento(argtratamiento);
     string pc(argpc);
-    string archivoSalida = "datos/pc" + pc + "-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
+    string archivoSalida = "data/pc" + pc + "-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
     freopen(archivoSalida.c_str(), "w", stdout);
 
     int n = NUM_MUESTRAS;
