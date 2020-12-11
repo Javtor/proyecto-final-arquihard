@@ -27,8 +27,8 @@ var (
 	t          string
 	imgVersion string
 
-	inputImgPath   = filepath.FromSlash("../../img/%v.bmp")
-	outputImgPath  = filepath.FromSlash("../../img/inverted_%v.bmp")
+	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
+	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
 	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
 )
 
@@ -83,7 +83,7 @@ func makeArray(height, width int, img image.Image) [][]rgb {
 
 func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 	fmt.Println(fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t))
-	f, err := os.Create(filepath.Join("../../datos/", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)))
+	f, err := os.Create(filepath.Join("./datos/", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)))
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 
 		normalized := elapsed / int64(width*height)
 
-		_, err = f.WriteString(strconv.FormatInt(normalized, 10))
+		_, err = f.WriteString(strconv.FormatInt(normalized, 10)+"\n")
 		if err != nil {
 			return err
 		}

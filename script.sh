@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 # Compila el codigo de c++
-g++ code/invertir.cpp code/EasyBMP.cpp -o code/invertir
-# Ejecuta el coso
-code/invertir img/1000.bmp img/1000_inv.bmp 1 1
+go get "golang.org/x/image/bmp"
+go build src/go/invertir_go.go
+g++ src/cpp/invertir_cpp.cpp src/cpp/EasyBMP.cpp -o invertir_cpp
+# Ejecuta c++
+./invertir_cpp img/400.bmp img/400_inv.bmp 1 1
+./invertir_go 2 2 1 500

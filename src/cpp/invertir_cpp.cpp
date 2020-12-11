@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
     freopen(archivoSalida.c_str(), "w", stdout);
 
     int n = NUM_MUESTRAS;
+    n++;
     while (n--)
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -160,7 +161,8 @@ int main(int argc, char *argv[])
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         auto cnt = (double)duration.count();
         double normalized = cnt / (double)(width * height);
-        std::cout << normalized << std::endl;
+        if(n != NUM_MUESTRAS)
+            std::cout << normalized << std::endl;
     }
 
     //Escribe la matriz de pixeles en el nuevo bmp
