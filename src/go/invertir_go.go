@@ -175,14 +175,11 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		normalized := float64(elapsed) / float64(width*height)
 
 		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", strconv.FormatInt(int64(n+1), 10), strconv.FormatFloat(normalized, 'f', 3, 64)}
-		writer := csv.NewWriter(f)
 
-		err = writer.Write(row)
+		_, err = f.WriteString(strconv.FormatFloat(normalized, 'f', 3, 64) + "\n")
 		if err != nil {
 			return err
 		}
-
-		writer.Flush()
 
 		writerFullCSVFile := csv.NewWriter(fCsv)
 		err = writerFullCSVFile.Write(row)
