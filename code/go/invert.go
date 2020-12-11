@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"golang.org/x/image/bmp"
@@ -22,8 +23,13 @@ const (
 )
 
 var (
-	inputImgPath  = filepath.FromSlash("./img/img.bmp")
-	outputImgPath = filepath.FromSlash("./img/inverted_img.bmp")
+	pcVersion  string
+	t          string
+	imgVersion string
+
+	inputImgPath   = filepath.FromSlash("../../img/%v.bmp")
+	outputImgPath  = filepath.FromSlash("../../img/inverted_%v.bmp")
+	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
 )
 
 func invert(t int, in, out string) error {
@@ -76,6 +82,11 @@ func makeArray(height, width int, img image.Image) [][]rgb {
 }
 
 func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
+	fmt.Println(fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t))
+	f, err := os.Create(filepath.Join("../../datos/", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)))
+	if err != nil {
+		return err
+	}
 
 	for n := 0; n < N_MUESTRAS; n++ {
 		start := time.Now()
@@ -88,7 +99,6 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
 				}
 			}
-			break
 		case 2:
 			for r := 0; r < height; r++ {
 				for c := 0; c < width; c++ {
@@ -106,7 +116,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
 				}
 			}
-			break
+
 		case 3:
 			for c := 0; c < width; c++ {
 				for r := 0; r < height; r++ {
@@ -115,7 +125,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
 				}
 			}
-			break
+
 		case 4:
 			for r := 0; r < height; r++ {
 				for c := 0; c < width; c++ {
@@ -129,7 +139,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
 				}
 			}
-			break
+
 		case 5:
 			for r := 0; r < height; r += 2 {
 				for c := 0; c < width; c += 2 {
@@ -150,22 +160,23 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 					rgbArr[r+1][c+1].b = 255 - rgbArr0[r+1][c+1].b
 				}
 			}
-			break
-		default:
-			break
+
 		}
 
 		stop := time.Now()
 		elapsed := stop.Sub(start).Nanoseconds()
 
 		normalized := elapsed / int64(width*height)
-		fmt.Println(version, " : ", normalized)
 
+		_, err = f.WriteString(strconv.FormatInt(normalized, 10))
+		if err != nil {
+			return err
+		}
 	}
-
+	f.Close()
 	//Write new img
 
-	f, err := os.Create(outputImgPath)
+	fImg, err := os.Create(outputImgPath)
 	if err != nil {
 		return err
 	}
@@ -181,11 +192,26 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		}
 	}
 
-	return bmp.Encode(f, img)
+	return bmp.Encode(fImg, img)
 }
 
 func main() {
-	err := invert(2, inputImgPath, outputImgPath)
+
+	args := os.Args
+	pcVersion = args[1]
+	t = args[3]
+	imgVersion = args[4]
+
+	inputImgPath = fmt.Sprintf(inputImgPath, imgVersion)
+	outputImgPath = fmt.Sprintf(outputImgPath, imgVersion)
+
+	fmt.Println(inputImgPath, outputImgPath)
+	version, err := strconv.Atoi(args[2])
+	if err != nil {
+		panic(err)
+	}
+
+	err = invert(version, inputImgPath, outputImgPath)
 	if err != nil {
 		fmt.Println(err)
 	}
