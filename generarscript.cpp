@@ -1,11 +1,14 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+
 using namespace std;
 
 int main()
 {
     freopen("script.sh", "w", stdout);
+    
+
     cout << "#!/usr/bin/bash\n"
          << "# Compila el codigo de c++\n"
          << "go get \"golang.org/x/image/bmp\"\n"

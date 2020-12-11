@@ -3,6 +3,7 @@
 #include "EasyBMP.h"
 #include <cstring>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 
@@ -29,10 +30,17 @@ int main(int argc, char *argv[])
     auto argtratamiento = argv[3];
     auto argorigen = argv[4];
 
+    fstream apilados;
+    apilados.open("apilados.csv", fstream::app);
+
+    if(!(apilados.good())){
+        apilados << "PC;Tam (nxn);Algoritmo;Lenguaje;Repeticion;Tiempo (ns)";
+    }
+
     // Lee el bmp dentro de la matriz de pixeles
     BMP img;
-    string srcPath = "img/"+string(argorigen)+".bmp";
-    string dstPath = "img/inverted_"+string(argorigen)+".bmp";
+    string srcPath = "img/" + string(argorigen) + ".bmp";
+    string dstPath = "img/inverted_" + string(argorigen) + ".bmp";
     img.ReadFromFile(srcPath.c_str());
     const int width = img.TellWidth();
     const int height = img.TellHeight();
@@ -56,11 +64,10 @@ int main(int argc, char *argv[])
     long version = strtol(argversion, NULL, 10);
     string tratamiento(argtratamiento);
     string pc(argpc);
-    string archivoSalida = "datos/pc"+pc+"-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
+    string archivoSalida = "datos/pc" + pc + "-cpp-" + to_string(width) + "-version" + to_string(version) + "-tratamiento" + tratamiento + ".txt";
     freopen(archivoSalida.c_str(), "w", stdout);
 
     int n = NUM_MUESTRAS;
-    n++;
     while (n--)
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -131,25 +138,25 @@ int main(int argc, char *argv[])
             }
             break;
         case 5:
-            for (int r = 0; r < height; r+=2)
+            for (int r = 0; r < height; r += 2)
             {
-                for (int c = 0; c < width; c+=2)
+                for (int c = 0; c < width; c += 2)
                 {
                     ImRGB0[r][c].r = 255 - ImRGB[r][c].r;
                     ImRGB0[r][c].g = 255 - ImRGB[r][c].g;
                     ImRGB0[r][c].b = 255 - ImRGB[r][c].b;
 
-                    ImRGB0[r][c+1].r = 255 - ImRGB[r][c+1].r;
-                    ImRGB0[r][c+1].g = 255 - ImRGB[r][c+1].g;
-                    ImRGB0[r][c+1].b = 255 - ImRGB[r][c+1].b;
+                    ImRGB0[r][c + 1].r = 255 - ImRGB[r][c + 1].r;
+                    ImRGB0[r][c + 1].g = 255 - ImRGB[r][c + 1].g;
+                    ImRGB0[r][c + 1].b = 255 - ImRGB[r][c + 1].b;
 
-                    ImRGB0[r+1][c].r = 255 - ImRGB[r+1][c].r;
-                    ImRGB0[r+1][c].g = 255 - ImRGB[r+1][c].g;
-                    ImRGB0[r+1][c].b = 255 - ImRGB[r+1][c].b;
+                    ImRGB0[r + 1][c].r = 255 - ImRGB[r + 1][c].r;
+                    ImRGB0[r + 1][c].g = 255 - ImRGB[r + 1][c].g;
+                    ImRGB0[r + 1][c].b = 255 - ImRGB[r + 1][c].b;
 
-                    ImRGB0[r+1][c+1].r = 255 - ImRGB[r+1][c+1].r;
-                    ImRGB0[r+1][c+1].g = 255 - ImRGB[r+1][c+1].g;
-                    ImRGB0[r+1][c+1].b = 255 - ImRGB[r+1][c+1].b;
+                    ImRGB0[r + 1][c + 1].r = 255 - ImRGB[r + 1][c + 1].r;
+                    ImRGB0[r + 1][c + 1].g = 255 - ImRGB[r + 1][c + 1].g;
+                    ImRGB0[r + 1][c + 1].b = 255 - ImRGB[r + 1][c + 1].b;
                 }
             }
             break;
@@ -161,8 +168,8 @@ int main(int argc, char *argv[])
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         auto cnt = (double)duration.count();
         double normalized = cnt / (double)(width * height);
-        if(n != NUM_MUESTRAS)
-            std::cout << normalized << std::endl;
+        std::cout << normalized << std::endl;
+        apilados << pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento + ";" + to_string(normalized) << std::endl;
     }
 
     //Escribe la matriz de pixeles en el nuevo bmp
