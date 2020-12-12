@@ -18,7 +18,6 @@ int main()
     vector<string> lenguajes = {"invertir_cpp", "invertir_go"};
     vector<string> imgs = {"400", "500", "600", "700", "800", "900", "1000", "1100"};
 
-    int pc = 1;
     int tratamientos = 3;
     int algoritmos = 5;
 
@@ -31,7 +30,7 @@ int main()
             {
                 for (auto img : imgs)
                 {
-                    string comando = "./" + lang + "  " + to_string(pc) + " " + to_string(alg) + " " + to_string(trat) + " " + img;
+                    string comando = "./" + lang + " $1 " + to_string(alg) + " " + to_string(trat) + " " + img;
                     comandos.push_back(comando);
                 }
             }

@@ -1,4 +1,4 @@
-// #pragma GCC optimize("O2") 
+#pragma GCC optimize("O2") 
 #include <iostream>
 #include <stdlib.h>
 #include "EasyBMP.h"
