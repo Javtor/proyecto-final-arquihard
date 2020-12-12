@@ -193,11 +193,6 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 			return err
 		}
 
-		err = WriteMetrics(pcVersion, "go", imgVersion, strconv.FormatInt(int64(version), 10), t, filepath.Join("data", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)), metricsFilename)
-		if err != nil {
-			return err
-		}
-
 		writerFullCSVFile := csv.NewWriter(fCsv)
 		writerFullCSVFile.Comma = ';'
 		err = writerFullCSVFile.Write(row)
