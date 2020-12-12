@@ -180,7 +180,10 @@ int main(int argc, char *argv[])
         apilados << pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento + ";" + to_string(normalized) << std::endl;
     }
 
-    double sum = accumulate(datos.begin(),datos.end(),0);
+    double sum = 0.0;
+    for(double dato : datos){
+        sum += dato;
+    }
     double media = sum/datos.size();
     double varianza = 0;
     for(double dato : datos){
@@ -191,7 +194,7 @@ int main(int argc, char *argv[])
     double tamMuestra = (confianza*desv/error)*(confianza*desv/error);
 
 
-     metricas<< pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento + ";" + to_string(media) +';'+to_string(varianza) +';'+to_string(desv) +';'+to_string(tamMuestra)<< std::endl;
+     metricas<< pc + ";" + argorigen + ";" + to_string(version) + ";c++;" + argtratamiento +';'+ to_string(media) +';'+to_string(varianza) +';'+to_string(desv) +';'+to_string(tamMuestra)<< std::endl;
 
     //Escribe la matriz de pixeles en el nuevo bmp
     for (int r = 0; r < height; r++)

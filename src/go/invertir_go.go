@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,8 +31,11 @@ var (
 
 	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
 	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
-	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.csv"
+	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.txt"
 	csvFile        = "apilados.csv"
+	metricasFile   = "metricas.csv"
+	confianza      = 1.96
+	errMax         = 0.25
 )
 
 func invert(t int, in, out string) error {
@@ -93,6 +97,13 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 	if err != nil {
 		return err
 	}
+
+	fMetricas, err := os.OpenFile(metricasFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+
+	var datos []float64
 
 	for n := 0; n < N_MUESTRAS; n++ {
 		start := time.Now()
@@ -173,6 +184,7 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		elapsed := stop.Sub(start).Nanoseconds()
 
 		normalized := float64(elapsed) / float64(width*height)
+		datos = append(datos, normalized)
 
 		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", t, strconv.FormatFloat(normalized, 'f', 3, 64)}
 
@@ -190,11 +202,39 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 
 		writerFullCSVFile.Flush()
 	}
+
+	sum := 0.0
+	for _, dato := range datos {
+		sum += dato
+	}
+	media := sum / float64(len(datos))
+	varianza := 0.0
+	for _, dato := range datos {
+		varianza += (dato - media) * (dato - media)
+	}
+	varianza /= float64(len(datos) - 1)
+	desv := math.Sqrt(varianza)
+
+	tamMuestra := (confianza * desv / errMax) * (confianza * desv / errMax)
+
+	row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", t, strconv.FormatFloat(media, 'f', 3, 64), strconv.FormatFloat(varianza, 'f', 3, 64), strconv.FormatFloat(desv, 'f', 3, 64), strconv.FormatFloat(tamMuestra, 'f', 3, 64)}
+	writerFullCSVFile := csv.NewWriter(fMetricas)
+	writerFullCSVFile.Comma = ';'
+	err = writerFullCSVFile.Write(row)
+	if err != nil {
+		return err
+	}
+	writerFullCSVFile.Flush()
+
 	err = f.Close()
 	if err != nil {
 		return err
 	}
 	err = fCsv.Close()
+	if err != nil {
+		return err
+	}
+	err = fMetricas.Close()
 	if err != nil {
 		return err
 	}
