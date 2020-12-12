@@ -6,3 +6,8 @@ La descripción de cada tratamiento (media, varianza, desviación y tamaño de m
 genera en el archivo metrics.csv
 
 Los datos apilados quedan en apilados.csv
+
+Los datos individuales quedan en la carpeta data
+
+-Javier Torres
+-Alejandro Barrera
