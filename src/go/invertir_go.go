@@ -28,10 +28,11 @@ var (
 	t          string
 	imgVersion string
 
-	inputImgPath   = filepath.FromSlash("./img/%v.bmp")
-	outputImgPath  = filepath.FromSlash("./img/inverted_%v.bmp")
-	outputFileName = "pc%v-go-%v-version%v-tratamiento%s.csv"
-	csvFile        = "apilados.csv"
+	inputImgPath    = filepath.FromSlash("./img/%v.bmp")
+	outputImgPath   = filepath.FromSlash("./img/inverted_%v.bmp")
+	outputFileName  = "pc%v-go-%v-version%v-tratamiento%s.csv"
+	csvFile         = "apilados.csv"
+	metricsFilename = "metrics.csv"
 )
 
 func invert(t int, in, out string) error {
@@ -177,6 +178,11 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		row := []string{pcVersion, imgVersion, strconv.FormatInt(int64(version), 10), "go", t, strconv.FormatFloat(normalized, 'f', 3, 64)}
 
 		_, err = f.WriteString(strconv.FormatFloat(normalized, 'f', 3, 64) + "\n")
+		if err != nil {
+			return err
+		}
+
+		err = WriteMetrics(pcVersion, "go", imgVersion, strconv.FormatInt(int64(version), 10), t, filepath.Join("data", fmt.Sprintf(outputFileName, pcVersion, imgVersion, version, t)), metricsFilename)
 		if err != nil {
 			return err
 		}

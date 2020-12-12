@@ -13,22 +13,28 @@ import (
 
 const dataLines = 100
 
-func writeMetrics(in, out string) error {
+// WriteMetrics escribir metricas apiladas
+func WriteMetrics(pc, lenguaje, tamano, version, tratamiento, in, out string) error {
 	data, err := readData(in)
 	if err != nil {
+		fmt.Println(data)
 		return err
 	}
 
-	f, err := os.Create(out)
+	f, err := os.OpenFile(out, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
 
 	writer := csv.NewWriter(f)
-	writer.Write([]string{"promedio", "desviacion", "tamano muestra"})
+	writer.Comma = ';'
 	mean := strconv.FormatFloat(calcMean(data), 'f', 3, 64)
 	deviation := strconv.FormatFloat(calcDeviation(data), 'f', 3, 64)
-	writer.Write([]string{mean, deviation, "0"})
+
+	err = writer.Write([]string{mean, deviation, "0"})
+	if err != nil {
+		return err
+	}
 	writer.Flush()
 
 	return nil
@@ -40,7 +46,12 @@ func readData(in string) ([]float64, error) {
 		return nil, err
 	}
 
-	defer f.Close()
+	defer func() {
+		errClose := f.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
 
 	reader := bufio.NewReader(f)
 	lines := make([]string, dataLines)
@@ -102,16 +113,9 @@ func calcDeviation(data []float64) float64 {
 		sd += math.Pow(data[i]-mean, 2)
 	}
 
-	return math.Sqrt(sd / float64(len(data)))
+	return math.Sqrt(sd / float64(len(data)-1))
 }
 
 func calcSampleSize(data []float64) float64 {
 	return 0
-}
-
-func main() {
-	err := writeMetrics("data/pc2-go-700-version2-tratamiento1.csv", "test")
-	if err != nil {
-		fmt.Println(err)
-	}
 }
